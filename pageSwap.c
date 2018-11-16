@@ -241,6 +241,7 @@ statPtr LRU(nodePtr head, int frameSize) {
   }
   stats->totalFault = fault; 
   freeQueue(&frame);
+  freeQueue(&head);
   return stats;
 }
 
@@ -290,7 +291,8 @@ statPtr MRU(nodePtr head, int frameSize) {
     }
   }
   stats->totalFault = fault; 
-  //freeQueue(&frame);
+  freeQueue(&frame);
+  freeQueue(&head);
   return stats;
 }
 
@@ -323,9 +325,7 @@ statPtr OPTIMAL(nodePtr head, int frameSize) {
         pageId = compare( head, frame);
         //pop page Id 
         tempOUT = popPageId(&frame, pageId);
-       // printf("POP here pid = %d\n", tempOUT->page->pageId);
         free(tempOUT);
-        //free(pop(&frame, 0));
       }
       fault++;
       tempIN->page->lastTime = time;
@@ -340,6 +340,7 @@ statPtr OPTIMAL(nodePtr head, int frameSize) {
   }
   stats->totalFault = fault; 
   freeQueue(&frame);
+  freeQueue(&head);
   return stats;
 }
 
@@ -367,11 +368,11 @@ printf("HERE # PRINT\n\n");
 
 int main(int argc, char *argv[])
 {
-  int frameSize = 1024;
+  int frameSize = 4;
   FILE* file;
-  //file = fopen ("sample.txt", "r");
+  file = fopen ("sample.txt", "r");
   //file = fopen ("sample2.txt", "r");
-  file = fopen ("pg-reference.txt", "r");
+  //file = fopen ("pg-reference.txt", "r");
   //file = fopen ("random.txt", "r");
   nodePtr head = NULL;
   nodePtr copy1 = NULL;

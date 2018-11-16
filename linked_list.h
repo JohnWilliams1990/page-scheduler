@@ -29,30 +29,6 @@ typedef struct node_t { // node type that contains the pcb structure
   pagePtr page;
 } node, *nodePtr;
 
-//typedef struct pcb_t { // pcb structure
-//  int pid;
-//  int arrivalTime;
-//  int burstTime;
-//  
-//  float finishTime;
-//  float waitTime;
-//  float turnTime;
-//  float respTime;
-//  int contextCount;
-//  
-//  int timeMarker;
-//  int firstRun;
-//  bool ran;
-//  int curRunningTime;
-//
-//} pcb,* pcbPtr ;
-
-
-void freeNode(nodePtr * arg) {
-  free((*arg)->page);
-  free((*arg));
-  return;
-}
 
 int least(nodePtr head) 
 {
@@ -90,47 +66,6 @@ int most(nodePtr head)
 }
 
 
-
-//// function that returns the pid for the pcb with the 
-//// least ammount of burst time for the list of processes that it is passed
-//int least(nodePtr head) 
-//{
-//  nodePtr curPtr = head;
-//  int burst = curPtr->process->burstTime; 
-//  int pid = curPtr->process->pid;
-//  while (curPtr != NULL) // iterate through list
-//  {
-//    if (curPtr->process->burstTime < burst) // find smallees burts time
-//    {
-//      burst = curPtr->process->burstTime;
-//      pid = curPtr->process->pid;
-//    }
-//    curPtr = curPtr->next;
-//  }
-//  return pid; // return pid of smallest burst time
-//}
-//
-//// function that returns the pid for the pcb with the 
-//// least ammount of remaining burst time for 
-//// the list of processes that it is passed
-//int leastleft(nodePtr head)
-//{
-//  nodePtr curPtr = head;
-//  int burst = curPtr->process->burstTime - curPtr->process->curRunningTime;
-//  int pid = curPtr->process->pid;
-//  while (curPtr != NULL) // find least remaining time
-//  {
-//    if ((curPtr->process->burstTime - curPtr->process->curRunningTime) < burst)
-//    {
-//      burst = curPtr->process->burstTime - curPtr->process->curRunningTime;
-//      pid = curPtr->process->pid;
-//    }
-//    curPtr = curPtr->next;
-//  }
-//  return pid;
-//}
-
-
 // function that pushed the element to back of list
 // function uses iterative method to remove 
 // limitations of recursion for large lists of processes
@@ -144,7 +79,8 @@ void push_back( nodePtr * arg, node* item)
     (*arg) = malloc( sizeof(node)); 
     (*arg)->prev = NULL; // assigne values based on object being pushed
     (*arg)->next = NULL;  
-    (*arg)->page = calloc(1, sizeof( pagePtr));
+    //(*arg)->page = calloc(1, sizeof(page));
+    (*arg)->page = calloc(1, sizeof(page*));
     (*arg)->page->pageId = item->page->pageId;
     (*arg)->page->lastTime = item->page->lastTime;
     (*arg)->page->timesUsed = item->page->timesUsed;
@@ -159,7 +95,8 @@ void push_back( nodePtr * arg, node* item)
   }
   curPtr->next = calloc(1, sizeof(node));
 
-  curPtr->next->page = calloc(1, sizeof( pagePtr));
+  //curPtr->next->page = calloc(1, sizeof(page*));
+  curPtr->next->page = calloc(1, sizeof(pagePtr));
   curPtr->next->page->pageId = item->page->pageId;
   curPtr->next->page->lastTime = item->page->lastTime;
   curPtr->next->page->timesUsed = item->page->timesUsed;
@@ -468,6 +405,13 @@ nodePtr push( nodePtr * arg, node* item, int index)
 //
 //
 // deallocate entire array for end of program
+
+void freeNode(nodePtr * arg) {
+  free((*arg)->page);
+  free((*arg));
+  return;
+}
+
 void freeQueue(nodePtr*header)
 {
   nodePtr head = *header;
@@ -481,5 +425,4 @@ void freeQueue(nodePtr*header)
   } 
   (*header) = NULL;
 }
-
 #endif
