@@ -11,9 +11,9 @@ CXXFLAGS = -g -std=c99 -Werror
 
 LIBS = -lm
 
-OBJS = processor.o 
+OBJS = pageSwap.o 
 
-TARGET = processor
+TARGET = pageSwap
 
 $(TARGET): $(OBJS)
 	$(CC) -o $@ $(OBJS) $(LIBDIR) $(LIBS)        

@@ -29,30 +29,6 @@ typedef struct node_t { // node type that contains the pcb structure
   pagePtr page;
 } node, *nodePtr;
 
-//typedef struct pcb_t { // pcb structure
-//  int pid;
-//  int arrivalTime;
-//  int burstTime;
-//  
-//  float finishTime;
-//  float waitTime;
-//  float turnTime;
-//  float respTime;
-//  int contextCount;
-//  
-//  int timeMarker;
-//  int firstRun;
-//  bool ran;
-//  int curRunningTime;
-//
-//} pcb,* pcbPtr ;
-
-
-void freeNode(nodePtr * arg) {
-  free((*arg)->page);
-  free((*arg));
-  return;
-}
 
 int least(nodePtr head) 
 {
@@ -90,47 +66,6 @@ int most(nodePtr head)
 }
 
 
-
-//// function that returns the pid for the pcb with the 
-//// least ammount of burst time for the list of processes that it is passed
-//int least(nodePtr head) 
-//{
-//  nodePtr curPtr = head;
-//  int burst = curPtr->process->burstTime; 
-//  int pid = curPtr->process->pid;
-//  while (curPtr != NULL) // iterate through list
-//  {
-//    if (curPtr->process->burstTime < burst) // find smallees burts time
-//    {
-//      burst = curPtr->process->burstTime;
-//      pid = curPtr->process->pid;
-//    }
-//    curPtr = curPtr->next;
-//  }
-//  return pid; // return pid of smallest burst time
-//}
-//
-//// function that returns the pid for the pcb with the 
-//// least ammount of remaining burst time for 
-//// the list of processes that it is passed
-//int leastleft(nodePtr head)
-//{
-//  nodePtr curPtr = head;
-//  int burst = curPtr->process->burstTime - curPtr->process->curRunningTime;
-//  int pid = curPtr->process->pid;
-//  while (curPtr != NULL) // find least remaining time
-//  {
-//    if ((curPtr->process->burstTime - curPtr->process->curRunningTime) < burst)
-//    {
-//      burst = curPtr->process->burstTime - curPtr->process->curRunningTime;
-//      pid = curPtr->process->pid;
-//    }
-//    curPtr = curPtr->next;
-//  }
-//  return pid;
-//}
-
-
 // function that pushed the element to back of list
 // function uses iterative method to remove 
 // limitations of recursion for large lists of processes
@@ -144,7 +79,8 @@ void push_back( nodePtr * arg, node* item)
     (*arg) = malloc( sizeof(node)); 
     (*arg)->prev = NULL; // assigne values based on object being pushed
     (*arg)->next = NULL;  
-    (*arg)->page = calloc(1, sizeof( pagePtr));
+    //(*arg)->page = calloc(1, sizeof(page));
+    (*arg)->page = calloc(1, sizeof(pagePtr));
     (*arg)->page->pageId = item->page->pageId;
     (*arg)->page->lastTime = item->page->lastTime;
     (*arg)->page->timesUsed = item->page->timesUsed;
@@ -159,7 +95,8 @@ void push_back( nodePtr * arg, node* item)
   }
   curPtr->next = calloc(1, sizeof(node));
 
-  curPtr->next->page = calloc(1, sizeof( pagePtr));
+  //curPtr->next->page = calloc(1, sizeof(page*));
+  curPtr->next->page = calloc(1, sizeof(pagePtr));
   curPtr->next->page->pageId = item->page->pageId;
   curPtr->next->page->lastTime = item->page->lastTime;
   curPtr->next->page->timesUsed = item->page->timesUsed;
@@ -265,31 +202,6 @@ printf("| %10s |  %10s | %10s |\n","Page Id", "last Time", "Times Used" );
    printf("");
 }
 
-
-void printHead( statPtr* args)
-{
-  statPtr arg = (*args);
-  printf(" %50s\n","Page Fault Rates" );
-  printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-  printf("| %10s | %10s | %6d | %6d | %6d | %6d | %6d |\n","Algorithm", "Total Faults", arg->interval, 2* arg->interval, 3* arg->interval, 4*arg->interval, 5*arg->interval );
-}
-void printStat( statPtr* args, char* name)
-{
-
-statPtr arg = (*args);
-  if (arg == NULL)
-  {
-    return; 
-  }
-  //printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-  //printf(" %50s\n","Page Fault Rates" );
-  //printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-  //printf("| %10s | %10s | %6d | %6d | %6d | %6d | %6d |\n","Algorithm", "Total Faults", arg->interval, 2* arg->interval, 3* arg->interval, 4*arg->interval, 5*arg->interval );
-  printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-  printf("| %10s | %12d | %6.3f | %6.3f | %6.3f | %6.3f | %6.3f |\n",name, arg->totalFault, arg->avg[0], arg->avg[1], arg->avg[2], arg->avg[3], arg->avg[4]);
-  printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-  printf("");
-}
 
 // function used to count the number fo nodes in linked list
 // 
@@ -468,6 +380,13 @@ nodePtr push( nodePtr * arg, node* item, int index)
 //
 //
 // deallocate entire array for end of program
+
+void freeNode(nodePtr * arg) {
+  free((*arg)->page);
+  free((*arg));
+  return;
+}
+
 void freeQueue(nodePtr*header)
 {
   nodePtr head = *header;
@@ -481,5 +400,328 @@ void freeQueue(nodePtr*header)
   } 
   (*header) = NULL;
 }
+
+nodePtr copy(nodePtr* head) 
+{
+  nodePtr copyHead = NULL; 
+  nodePtr currentPage = calloc(1, sizeof( node));
+  currentPage->page = calloc(1,sizeof(pagePtr));
+  nodePtr curPtr = (*head);
+  while (curPtr != NULL) // iterate through list
+  {
+   // printf("%d",curPtr->page->pageId);
+    currentPage->page->pageId = curPtr->page->pageId;;
+    push_back(&copyHead, currentPage); 
+    curPtr = curPtr->next;
+  }
+  return copyHead; // return pid of smallest burst time
+}
+
+
+long compare(nodePtr head, nodePtr frame) 
+{
+  long least = 0;
+  int leastPageId = 0;
+  nodePtr HeadStart = head;
+  nodePtr frameStart = frame; 
+  nodePtr curHeadPtr = head;
+  nodePtr curFramePtr = frame;
+  while (curFramePtr != NULL) // iterate through list
+  {
+    curFramePtr->page->count = 0;
+    curFramePtr = curFramePtr->next;
+  }
+
+  curHeadPtr = head;
+  curFramePtr = frame;
+
+  while (curFramePtr != NULL) // iterate through frame
+  {
+    while (curHeadPtr != NULL) // iterate through head
+    { 
+      if (curFramePtr->page->pageId == curHeadPtr->page->pageId)
+      {
+        curFramePtr->page->count += 1;
+      }
+      //curFramePtr = curFramePtr->next;
+      curHeadPtr = curHeadPtr->next;
+    }
+      curHeadPtr = HeadStart;
+      curFramePtr = curFramePtr->next;
+  }
+    
+  curHeadPtr = HeadStart;
+  curFramePtr = frameStart;
+
+  least = curFramePtr->page->count;
+  leastPageId = curFramePtr->page->pageId;
+  while (curFramePtr != NULL) // iterate through list
+  {
+    if (curFramePtr->page->count < least)
+    {
+      least = curFramePtr->page->count;
+      leastPageId = curFramePtr->page->pageId;
+    }
+    curFramePtr = curFramePtr->next;
+  }
+
+
+  return leastPageId; // return pid of smallest burst time
+}
+
+// reads file into the linked list or queue
+// function assumes that correct input is given
+nodePtr read_in_file(FILE* file, nodePtr head){
+  nodePtr currentPage = calloc(1, sizeof(node));
+  currentPage->page = calloc(1, sizeof(pagePtr));
+  currentPage->page->lastTime = 0;
+  currentPage->page->timesUsed = 0;
+  //currentPage->page = calloc(1, sizeof(pagePtr));
+  int index = 0;
+  while (!feof (file)){ // go length of file
+    index = -99;
+    fscanf (file, "%d", &index); // scan and input values   
+    if (index != -99) 
+    { 
+      currentPage->page->pageId = index;
+      push_back(&head, currentPage); 
+    }
+  }
+  //freeNode(&currentPage); // free the node used and return the linked list
+  return head;
+}
+
+
+// check the frame to see if its in there 
+bool check(nodePtr head, int value, int time)
+{
+  int sum = 0;
+  nodePtr curPtr = head;
+  while (curPtr != NULL)
+  { 
+    if (curPtr->page->pageId == value)
+    {
+      curPtr->page->lastTime = time; 
+      return true;
+    }
+    curPtr = curPtr->next;
+  }
+  return false; 
+}
+
+
+
+statPtr FCFS(nodePtr head, int frameSize) {
+  statPtr stats = calloc(1, sizeof(struct stat_t));
+  stats->interval = count(head) / 5;
+  stats->name = "FCFS";
+  stats->avg = calloc(5, sizeof(float));;
+  nodePtr frame = NULL;
+  nodePtr tempIN = calloc(1, sizeof(node));
+  int fault = 0;
+  bool checklist = false;
+  long int time = 0; 
+  float stuff[5];
+  while (count(head)) {
+    tempIN = pop(&head, 0);
+    checklist = check( frame, tempIN->page->pageId, 0);
+    if (checklist) // check frame for page id to see if its already there
+    { 
+      free(tempIN); // page exists in frame so delete
+    }
+    else
+    {
+      if (count(frame) == frameSize) // if fram is full then page swap
+      {
+        free(pop(&frame, 0));
+      } 
+      fault++;
+      push_back(&frame, tempIN);
+    }
+    time++;
+    if (time != 0 && time % stats->interval == 0){
+      stats->avg[ ((time/stats->interval) -1 ) ] = (float)fault/(float)time; 
+    }
+  }
+  stats->totalFault = fault; 
+  freeQueue(&frame);
+  freeQueue(&head);
+  return stats;
+}
+
+
+
+
+statPtr LRU(nodePtr head, int frameSize) {
+  statPtr stats = calloc(1, sizeof(struct stat_t));
+  stats->interval = count(head) / 5;
+  stats->avg = calloc(5, sizeof(float));;
+  stats->name = "LRU";
+  nodePtr frame = NULL;
+  nodePtr tempIN = calloc(1, sizeof(node));
+  nodePtr tempOUT = calloc(1, sizeof(node));
+  int fault = 0;
+  bool checklist = false;
+  long int time = 0; 
+  int pageId = -99;
+  while (count(head)) {
+    tempIN = pop(&head, 0);
+    checklist = check( frame, tempIN->page->pageId, time);
+    if (checklist) // check frame for page id to see if its already there
+    { 
+      // page exists in frame so delete
+      free(tempIN);
+    }
+    else
+    {
+      if (count(frame) == frameSize) // if fram is full then page swap
+      {
+        pageId = least(frame);
+        //pop page Id 
+        tempOUT = popPageId(&frame, pageId);
+        free(tempOUT);
+      }
+      fault++;
+      tempIN->page->lastTime = time;
+      push_back(&frame, tempIN);
+    }
+    time++;
+    if (time != 0 && time % stats->interval == 0){
+      stats->avg[ ((time/stats->interval) -1 ) ] = (float)fault/(float)time; 
+    }
+  }
+  stats->totalFault = fault; 
+  freeQueue(&frame);
+  freeQueue(&head);
+  return stats;
+}
+
+
+statPtr MRU(nodePtr head, int frameSize) {
+  statPtr stats = calloc(1, sizeof(struct stat_t));
+  stats->interval = count(head) / 5;
+  stats->avg = calloc(5, sizeof(float));;
+  stats->name = "MFU";
+  nodePtr frame = NULL;
+  nodePtr tempIN = calloc(1, sizeof(node));
+  nodePtr tempOUT = calloc(1, sizeof(node));
+  int fault = 0;
+  bool checklist = false;
+  long int time = 0; 
+  int pageId = -99;
+  while (count(head)) {
+    tempIN = pop(&head, 0);
+    checklist = check( frame, tempIN->page->pageId, time);
+    if (checklist) // check frame for page id to see if its already there
+    { 
+      // page exists in frame so delete
+      free(tempIN);
+    }
+    else
+    {
+      if (count(frame) == frameSize) // if fram is full then page swap
+      {
+        pageId = most(frame);
+        //pop page Id 
+        tempOUT = popPageId(&frame, pageId);
+        free(tempOUT);
+      }
+      fault++;
+      tempIN->page->lastTime = time;
+      push_back(&frame, tempIN);
+    }
+    time++;
+    if (time != 0 && time % stats->interval == 0){
+      stats->avg[ ((time/stats->interval) -1 ) ] = (float)fault/(float)time; 
+    }
+  }
+  stats->totalFault = fault; 
+  freeQueue(&frame);
+  freeQueue(&head);
+  return stats;
+}
+
+statPtr OPTIMAL(nodePtr head, int frameSize) {
+  statPtr stats = calloc(1, sizeof(struct stat_t));
+  stats->interval = count(head) / 5;
+  stats->avg = calloc(5, sizeof(float));;
+  stats->name = "OPTIMAL";
+  nodePtr frame = NULL;
+  nodePtr tempIN = calloc(1, sizeof(node));
+  nodePtr tempOUT = calloc(1, sizeof(node));
+  int fault = 0;
+  bool checklist = false;
+  long int time = 0; 
+  int pageId = -99;
+  while (count(head)) {
+    tempIN = pop(&head, 0);
+    checklist = check( frame, tempIN->page->pageId, time);
+    if (checklist) // check frame for page id to see if its already there
+    { 
+      // page exists in frame so delete
+      free(tempIN);
+    }
+    else
+    {
+      if (count(frame) == frameSize) // if fram is full then page swap
+      {
+        pageId = compare( head, frame);
+        //pop page Id 
+        tempOUT = popPageId(&frame, pageId);
+        free(tempOUT);
+      }
+      fault++;
+      tempIN->page->lastTime = time;
+      push_back(&frame, tempIN);
+    }
+    time++;
+    if (time != 0 && time % stats->interval == 0){
+      stats->avg[ ((time/stats->interval) -1 ) ] = (float)fault/(float)time; 
+    }
+  }
+  stats->totalFault = fault; 
+  freeQueue(&frame); // clean up queues
+  freeQueue(&head);
+  return stats;
+}
+
+
+void printz(statPtr* stuff, int total, int frameSize, FILE * file){
+  long value = stuff[0]->interval;
+  printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+  printf(" Number of pages:%d  Frame Size: %d %30s\n", total, frameSize, "Page Fault Rates" );
+  printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+  printf("| %10s | %10s | %6d | %6d | %6d | %6d | %6d |\n","Algorithm", "Total Faults",value , 2* value, 3*value, 4*value, 5*value);
+  printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+  for (int i = 0; i < 4 ; ++i)
+  {
+  
+    printf("| %10s | %12d | %6.3f | %6.3f | %6.3f | %6.3f | %6.3f |\n",stuff[i]->name, stuff[i]->totalFault, stuff[i]->avg[0], stuff[i]->avg[1], stuff[i]->avg[2], stuff[i]->avg[3], stuff[i]->avg[4]);
+  }
+  printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+
+
+  fprintf(file, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+  fprintf(file, " Number of pages:%d  Frame Size: %d %30s\n", total, frameSize, "Page Fault Rates" );
+  fprintf(file, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+  fprintf(file, "| %10s | %10s | %6d | %6d | %6d | %6d | %6d |\n","Algorithm", "Total Faults",value , 2* value, 3*value, 4*value, 5*value);
+  fprintf(file, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+  for (int i = 0; i < 4 ; ++i)
+  {
+  
+    fprintf(file, "| %10s | %12d | %6.3f | %6.3f | %6.3f | %6.3f | %6.3f |\n",stuff[i]->name, stuff[i]->totalFault, stuff[i]->avg[0], stuff[i]->avg[1], stuff[i]->avg[2], stuff[i]->avg[3], stuff[i]->avg[4]);
+  }
+  fprintf(file, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+
+
+}
+
+
+void usage(){
+  printf("Usage:./pageSwap {frameSize} {input file} {output file} \n\n");
+  printf("\tframeSize must be greater than 0\n");
+  exit(0);
+}
+
 
 #endif
