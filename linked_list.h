@@ -80,7 +80,11 @@ void push_back( nodePtr * arg, node* item)
     (*arg)->prev = NULL; // assigne values based on object being pushed
     (*arg)->next = NULL;  
     //(*arg)->page = calloc(1, sizeof(page));
+<<<<<<< HEAD
     (*arg)->page = calloc(1, sizeof(pagePtr));
+=======
+    (*arg)->page = calloc(1, sizeof(page*));
+>>>>>>> f3c6c8e59df99c0155aa42d7be789e3e5cd0f26b
     (*arg)->page->pageId = item->page->pageId;
     (*arg)->page->lastTime = item->page->lastTime;
     (*arg)->page->timesUsed = item->page->timesUsed;
@@ -400,6 +404,7 @@ void freeQueue(nodePtr*header)
   } 
   (*header) = NULL;
 }
+<<<<<<< HEAD
 
 nodePtr copy(nodePtr* head) 
 {
@@ -724,4 +729,6 @@ void usage(){
 }
 
 
+=======
+>>>>>>> f3c6c8e59df99c0155aa42d7be789e3e5cd0f26b
 #endif
