@@ -12,15 +12,15 @@
 int main(int argc, char *argv[])
 {
 
-  //argv[1] = "3";
-  //argv[2] = "sample1.txt";
-  //argv[3] = "stuff";
-  //argc = 3;
-
-  argv[1] = "256";
-  argv[2] = "pg-reference.txt";
+  argv[1] = "3";
+  argv[2] = "sample1.txt";
   argv[3] = "stuff";
   argc = 3;
+
+  //argv[1] = "256";
+  //argv[2] = "pg-reference.txt";
+  //argv[3] = "stuff";
+  //argc = 3;
 
 
   if (argc < 3){ // check for number of arguments from commandline
