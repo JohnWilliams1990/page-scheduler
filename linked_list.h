@@ -14,7 +14,6 @@ typedef struct stat_t { // structure for statistics
   float*avg;
 } stat, * statPtr ;
 
-
 typedef struct page_t { // pcb structure
   int pageId;   
   int lastTime;
@@ -28,7 +27,6 @@ typedef struct node_t { // node type that contains the pcb structure
   int data;
   pagePtr page;
 } node, *nodePtr;
-
 
 int least(nodePtr head) 
 {
@@ -65,7 +63,6 @@ int most(nodePtr head)
   return pageId; // return pid of smallest burst time
 }
 
-
 // function that pushed the element to back of list
 // function uses iterative method to remove 
 // limitations of recursion for large lists of processes
@@ -73,18 +70,16 @@ void push_back( nodePtr * arg, node* item)
 {
   int counter = 1;
   nodePtr curPtr = (*arg);
+  
 
   if ( curPtr == NULL) // if the linked list is empty
   {
-    (*arg) = malloc( sizeof(node)); 
+    (*arg) = calloc(1, sizeof(struct node_t)); 
+    //(*arg) = calloc(1, sizeof(nodePtr)); 
     (*arg)->prev = NULL; // assigne values based on object being pushed
     (*arg)->next = NULL;  
-    //(*arg)->page = calloc(1, sizeof(page));
-<<<<<<< HEAD
-    (*arg)->page = calloc(1, sizeof(pagePtr));
-=======
-    (*arg)->page = calloc(1, sizeof(page*));
->>>>>>> f3c6c8e59df99c0155aa42d7be789e3e5cd0f26b
+    //(*arg)->page = calloc(1, sizeof(pagePtr));
+    (*arg)->page = calloc(1, sizeof(struct page_t));
     (*arg)->page->pageId = item->page->pageId;
     (*arg)->page->lastTime = item->page->lastTime;
     (*arg)->page->timesUsed = item->page->timesUsed;
@@ -97,10 +92,12 @@ void push_back( nodePtr * arg, node* item)
     curPtr = curPtr->next;
     counter +=1;
   }
-  curPtr->next = calloc(1, sizeof(node));
+  curPtr->next= calloc(1, sizeof(struct node_t)); 
+  //curPtr->next = malloc( sizeof(node));
+  //curPtr->next->page = malloc( sizeof(pagePtr));
 
-  //curPtr->next->page = calloc(1, sizeof(page*));
-  curPtr->next->page = calloc(1, sizeof(pagePtr));
+  curPtr->next->page = calloc(1, sizeof(struct page_t));
+
   curPtr->next->page->pageId = item->page->pageId;
   curPtr->next->page->lastTime = item->page->lastTime;
   curPtr->next->page->timesUsed = item->page->timesUsed;
@@ -145,7 +142,6 @@ nodePtr pop( nodePtr * arg, int index)
       (*arg)->prev = curPtr->prev;
     }
   }
-
   if (curPtr->next != NULL) // assigne previous if applicable
   {
     curPtr->next->prev = prev;
@@ -166,7 +162,6 @@ nodePtr pop_back( nodePtr * arg)
   {
     return curPtr;
   }
-
   while (curPtr->next != NULL)// iterate to item 
   {
     prev = curPtr;// reasign pointers
@@ -176,7 +171,6 @@ nodePtr pop_back( nodePtr * arg)
   if (prev != NULL) {// reasigne list pointers
     prev->next = curPtr->next;
   }
-
   return curPtr; // return node
 }
 
@@ -190,19 +184,17 @@ void print( nodePtr * arg)
   {
     return; 
   }
- printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-printf("| %10s |  %10s | %10s |\n","Page Id", "last Time", "Times Used" );
- printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+  printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+  printf("| %10s |  %10s | %10s |\n","Page Id", "last Time", "Times Used" );
+  printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
   while (curPtr != NULL)
   {
-
-  int lastTime;
-  int timesUsed;
-
-   printf("| %10d | %10d | %10d |\n",curPtr->page->pageId, curPtr->page->lastTime, curPtr->page->timesUsed);
-   curPtr = curPtr->next;
+    int lastTime;
+    int timesUsed;
+    printf("| %10d | %10d | %10d |\n",curPtr->page->pageId, curPtr->page->lastTime, curPtr->page->timesUsed);
+    curPtr = curPtr->next;
   }
- printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+  printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
    printf("");
 }
 
@@ -260,130 +252,7 @@ nodePtr popPageId( nodePtr * arg, int index)
     return curPtr; 
 }
 
-// function used to push node into list at specific point
-nodePtr push( nodePtr * arg, node* item, int index)
-{
-  int counter = 1;
-  nodePtr curPtr = (*arg);
-  nodePtr tmpPtr = NULL;
 
-
-  if ( curPtr == NULL)
-  {
-    (*arg) = calloc(1, sizeof( node));
-    (*arg)->prev = NULL;
-    (*arg)->next = NULL;  
-    (*arg)->page = calloc(1, sizeof( pagePtr));
-    (*arg)->page->pageId = item->page->pageId;
-    (*arg)->page->lastTime = item->page->lastTime;
-    (*arg)->page->timesUsed = item->page->timesUsed;
-    return (*arg);
-  }
-
-  while (counter < index - 1 && curPtr->next != NULL)
-  {
-     curPtr = curPtr->next;
-     counter += 1;
-  }
-
-  if (index == 1)
-  {
-    tmpPtr = calloc(1, sizeof( node));
-    tmpPtr->prev = NULL;
-    tmpPtr->next = NULL;
-    tmpPtr->page = calloc(1,sizeof( pagePtr));
-    tmpPtr->page->pageId = item->page->pageId;
-    tmpPtr->page->lastTime = item->page->lastTime;
-    tmpPtr->page->timesUsed = item->page->timesUsed;
-
-
-
-    tmpPtr->prev = NULL;
-    tmpPtr->next = curPtr;
-    
-    if (curPtr->prev != NULL)
-    {
-      curPtr->prev = tmpPtr;
-    }
-
-    return tmpPtr;
-  }
-
-
-  else {
-  
-  // grab item before overwriting it
-    tmpPtr = curPtr->next;
-    
-  
-    curPtr->next = calloc(1, sizeof(node));
-    curPtr->next->page = calloc(1, sizeof( pagePtr));
-    curPtr->next->page->pageId = item->page->pageId;
-    curPtr->next->page->lastTime = item->page->lastTime;
-    curPtr->next->page->timesUsed = item->page->timesUsed;
-
-    curPtr->next->prev = curPtr;
-    curPtr->next->data = counter;
-   
-    curPtr = curPtr->next;
-    curPtr->next = tmpPtr; 
-    
-    if (curPtr->next != NULL)
-    {
-      curPtr->next->prev = curPtr;
-    }
-  }
-  
-  
-  
-  return (*arg);
-
-}
-
-
-// since we know the order then walk through list poping and pushing bach into specific place in line
-//nodePtr sort(nodePtr header) {
-//  nodePtr tmp = NULL;
-//  nodePtr head = header;
-//  int processes = count(head);
-//  for (int i = 1; i < processes; i++)
-//  {
-//    tmp = popPid(&head, i);
-//    head = push(&head, tmp, i);
-//  }
-//  return head;
-//}
-//
-//
-//
-//
-//// get total amount of time needed for all burst times
-//int getTime(nodePtr head)
-//{
-//  int sum = 0;
-//  nodePtr curPtr = head;
-//  while (curPtr != NULL)
-//  {
-//    sum += curPtr->process->burstTime;
-//    curPtr = curPtr->next;
-//  }
-//  return sum; 
-//}
-//
-//// if user cannot provide correct parameters then give them these parameter lists
-//void usage(){
-//  printf("Usage:./processor {input_file} {schedling algorithm number} [time quantum size]\n\n");
-//  printf("\t Available algorithms: \n");
-//  printf("\t0: FCFS \n");
-//  printf("\t1: SJF \n");
-//  printf("\t2: SRTF \n");
-//  printf("\t3: RR\n");
-//  exit(0);
-//}
-//
-//
-//
-// deallocate entire array for end of program
 
 void freeNode(nodePtr * arg) {
   free((*arg)->page);
@@ -398,27 +267,32 @@ void freeQueue(nodePtr*header)
   int processes = count(head);
   for (int i = 0; i < processes; i++)
   {
+
     temp = pop( &head, 0);
-    //print(&temp);
+    //if (temp->page->pageId < 4069 && temp->page->pageId >= 1)
     freeNode(&temp);
-  } 
+    
+  }
+ 
+  if (*header != NULL)
   (*header) = NULL;
 }
-<<<<<<< HEAD
 
 nodePtr copy(nodePtr* head) 
 {
   nodePtr copyHead = NULL; 
-  nodePtr currentPage = calloc(1, sizeof( node));
-  currentPage->page = calloc(1,sizeof(pagePtr));
+  ////nodePtr currentPage = calloc(1, sizeof(struct node_t));
+  ////currentPage->page = calloc(1,sizeof(struct page_t));
   nodePtr curPtr = (*head);
   while (curPtr != NULL) // iterate through list
   {
-   // printf("%d",curPtr->page->pageId);
-    currentPage->page->pageId = curPtr->page->pageId;;
-    push_back(&copyHead, currentPage); 
+    ////currentPage->page->pageId = curPtr->page->pageId;;
+    ////push_back(&copyHead, currentPage); 
+    push_back(&copyHead, curPtr); 
     curPtr = curPtr->next;
   }
+  ////free(currentPage->page);
+  ////free(currentPage);
   return copyHead; // return pid of smallest burst time
 }
 
@@ -436,10 +310,8 @@ long compare(nodePtr head, nodePtr frame)
     curFramePtr->page->count = 0;
     curFramePtr = curFramePtr->next;
   }
-
   curHeadPtr = head;
   curFramePtr = frame;
-
   while (curFramePtr != NULL) // iterate through frame
   {
     while (curHeadPtr != NULL) // iterate through head
@@ -448,16 +320,13 @@ long compare(nodePtr head, nodePtr frame)
       {
         curFramePtr->page->count += 1;
       }
-      //curFramePtr = curFramePtr->next;
       curHeadPtr = curHeadPtr->next;
     }
       curHeadPtr = HeadStart;
       curFramePtr = curFramePtr->next;
-  }
-    
+  } 
   curHeadPtr = HeadStart;
   curFramePtr = frameStart;
-
   least = curFramePtr->page->count;
   leastPageId = curFramePtr->page->pageId;
   while (curFramePtr != NULL) // iterate through list
@@ -469,19 +338,18 @@ long compare(nodePtr head, nodePtr frame)
     }
     curFramePtr = curFramePtr->next;
   }
-
-
   return leastPageId; // return pid of smallest burst time
 }
+
+
 
 // reads file into the linked list or queue
 // function assumes that correct input is given
 nodePtr read_in_file(FILE* file, nodePtr head){
-  nodePtr currentPage = calloc(1, sizeof(node));
-  currentPage->page = calloc(1, sizeof(pagePtr));
+  nodePtr currentPage = calloc(1, sizeof(struct node_t));
+  currentPage->page = calloc(1, sizeof(struct page_t));
   currentPage->page->lastTime = 0;
   currentPage->page->timesUsed = 0;
-  //currentPage->page = calloc(1, sizeof(pagePtr));
   int index = 0;
   while (!feof (file)){ // go length of file
     index = -99;
@@ -492,10 +360,10 @@ nodePtr read_in_file(FILE* file, nodePtr head){
       push_back(&head, currentPage); 
     }
   }
-  //freeNode(&currentPage); // free the node used and return the linked list
+  free(currentPage->page);
+  free(currentPage);
   return head;
 }
-
 
 // check the frame to see if its in there 
 bool check(nodePtr head, int value, int time)
@@ -514,57 +382,61 @@ bool check(nodePtr head, int value, int time)
   return false; 
 }
 
-
-
-statPtr FCFS(nodePtr head, int frameSize) {
+statPtr FCFS(nodePtr* header, int frameSize) {
+  nodePtr head = (*header);
   statPtr stats = calloc(1, sizeof(struct stat_t));
   stats->interval = count(head) / 5;
   stats->name = "FCFS";
   stats->avg = calloc(5, sizeof(float));;
   nodePtr frame = NULL;
-  nodePtr tempIN = calloc(1, sizeof(node));
+  nodePtr tempIN ;
+  nodePtr tempOUT ;
   int fault = 0;
   bool checklist = false;
   long int time = 0; 
   float stuff[5];
   while (count(head)) {
     tempIN = pop(&head, 0);
+    
     checklist = check( frame, tempIN->page->pageId, 0);
     if (checklist) // check frame for page id to see if its already there
     { 
+      free(tempIN->page); // page exists in frame so delete
       free(tempIN); // page exists in frame so delete
     }
     else
     {
       if (count(frame) == frameSize) // if fram is full then page swap
       {
-        free(pop(&frame, 0));
+        tempOUT = pop(&frame, 0);
+        free(tempOUT->page);
+        free(tempOUT);
       } 
       fault++;
       push_back(&frame, tempIN);
     }
     time++;
-    if (time != 0 && time % stats->interval == 0){
+    if (time != 0 && time % stats->interval == 0 && ((time/stats->interval) -1 ) < 5){
       stats->avg[ ((time/stats->interval) -1 ) ] = (float)fault/(float)time; 
     }
   }
   stats->totalFault = fault; 
   freeQueue(&frame);
-  freeQueue(&head);
+  //*header = head;
+
+  // head is empty no need to free it //freeQueue(&head);
   return stats;
 }
 
-
-
-
-statPtr LRU(nodePtr head, int frameSize) {
+statPtr LRU(nodePtr *header, int frameSize) {
+  nodePtr head = (*header);
   statPtr stats = calloc(1, sizeof(struct stat_t));
   stats->interval = count(head) / 5;
   stats->avg = calloc(5, sizeof(float));;
   stats->name = "LRU";
   nodePtr frame = NULL;
-  nodePtr tempIN = calloc(1, sizeof(node));
-  nodePtr tempOUT = calloc(1, sizeof(node));
+  nodePtr tempIN ;//= calloc(1, sizeof(node));
+  nodePtr tempOUT ;//= calloc(1, sizeof(node));
   int fault = 0;
   bool checklist = false;
   long int time = 0; 
@@ -575,6 +447,7 @@ statPtr LRU(nodePtr head, int frameSize) {
     if (checklist) // check frame for page id to see if its already there
     { 
       // page exists in frame so delete
+      free(tempIN->page); // page exists in frame so delete
       free(tempIN);
     }
     else
@@ -584,6 +457,7 @@ statPtr LRU(nodePtr head, int frameSize) {
         pageId = least(frame);
         //pop page Id 
         tempOUT = popPageId(&frame, pageId);
+        free(tempOUT->page);
         free(tempOUT);
       }
       fault++;
@@ -591,25 +465,27 @@ statPtr LRU(nodePtr head, int frameSize) {
       push_back(&frame, tempIN);
     }
     time++;
-    if (time != 0 && time % stats->interval == 0){
+    if (time != 0 && time % stats->interval == 0 && ((time/stats->interval) -1     ) < 5){
       stats->avg[ ((time/stats->interval) -1 ) ] = (float)fault/(float)time; 
     }
   }
   stats->totalFault = fault; 
   freeQueue(&frame);
-  freeQueue(&head);
+
+  *header = head; 
   return stats;
 }
 
 
-statPtr MRU(nodePtr head, int frameSize) {
+statPtr MRU(nodePtr *header, int frameSize) {
+  nodePtr head = (*header);
   statPtr stats = calloc(1, sizeof(struct stat_t));
   stats->interval = count(head) / 5;
   stats->avg = calloc(5, sizeof(float));;
   stats->name = "MFU";
   nodePtr frame = NULL;
-  nodePtr tempIN = calloc(1, sizeof(node));
-  nodePtr tempOUT = calloc(1, sizeof(node));
+  nodePtr tempIN ;//= calloc(1, sizeof(node));
+  nodePtr tempOUT ;//= calloc(1, sizeof(node));
   int fault = 0;
   bool checklist = false;
   long int time = 0; 
@@ -620,6 +496,7 @@ statPtr MRU(nodePtr head, int frameSize) {
     if (checklist) // check frame for page id to see if its already there
     { 
       // page exists in frame so delete
+      free(tempIN->page); // page exists in frame so delete
       free(tempIN);
     }
     else
@@ -629,6 +506,7 @@ statPtr MRU(nodePtr head, int frameSize) {
         pageId = most(frame);
         //pop page Id 
         tempOUT = popPageId(&frame, pageId);
+        free(tempOUT->page);
         free(tempOUT);
       }
       fault++;
@@ -636,24 +514,25 @@ statPtr MRU(nodePtr head, int frameSize) {
       push_back(&frame, tempIN);
     }
     time++;
-    if (time != 0 && time % stats->interval == 0){
+    if (time != 0 && time % stats->interval == 0 && ((time/stats->interval) -1     ) < 5){
       stats->avg[ ((time/stats->interval) -1 ) ] = (float)fault/(float)time; 
     }
   }
   stats->totalFault = fault; 
   freeQueue(&frame);
-  freeQueue(&head);
+  *header = head; 
   return stats;
 }
 
-statPtr OPTIMAL(nodePtr head, int frameSize) {
+statPtr OPTIMAL(nodePtr* header, int frameSize) {
+  nodePtr head = (*header);
   statPtr stats = calloc(1, sizeof(struct stat_t));
   stats->interval = count(head) / 5;
-  stats->avg = calloc(5, sizeof(float));;
+  stats->avg = calloc(5, sizeof(float));//stats->name = calloc(7, sizeof(char));;
   stats->name = "OPTIMAL";
   nodePtr frame = NULL;
-  nodePtr tempIN = calloc(1, sizeof(node));
-  nodePtr tempOUT = calloc(1, sizeof(node));
+  nodePtr tempIN ;//= calloc(1, sizeof(node));
+  nodePtr tempOUT ;//= calloc(1, sizeof(node));
   int fault = 0;
   bool checklist = false;
   long int time = 0; 
@@ -664,6 +543,7 @@ statPtr OPTIMAL(nodePtr head, int frameSize) {
     if (checklist) // check frame for page id to see if its already there
     { 
       // page exists in frame so delete
+      free(tempIN->page); // page exists in frame so delete
       free(tempIN);
     }
     else
@@ -673,6 +553,7 @@ statPtr OPTIMAL(nodePtr head, int frameSize) {
         pageId = compare( head, frame);
         //pop page Id 
         tempOUT = popPageId(&frame, pageId);
+        free(tempOUT->page);
         free(tempOUT);
       }
       fault++;
@@ -680,13 +561,13 @@ statPtr OPTIMAL(nodePtr head, int frameSize) {
       push_back(&frame, tempIN);
     }
     time++;
-    if (time != 0 && time % stats->interval == 0){
+    if (time != 0 && time % stats->interval == 0 && ((time/stats->interval) -1     ) < 5){
       stats->avg[ ((time/stats->interval) -1 ) ] = (float)fault/(float)time; 
     }
   }
   stats->totalFault = fault; 
-  freeQueue(&frame); // clean up queues
-  freeQueue(&head);
+  freeQueue(&frame);
+  *header = head;
   return stats;
 }
 
@@ -727,8 +608,4 @@ void usage(){
   printf("\tframeSize must be greater than 0\n");
   exit(0);
 }
-
-
-=======
->>>>>>> f3c6c8e59df99c0155aa42d7be789e3e5cd0f26b
 #endif

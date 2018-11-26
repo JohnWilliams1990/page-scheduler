@@ -35,6 +35,10 @@ def work(time):
     LRU =     [ 0.818, 0.787, 0.769, 0.765, 0.758 ] 
     MFU =     [ 0.812, 0.771, 0.771, 0.764, 0.763 ] 
     OPTIMAL = [ 0.795, 0.695, 0.632, 0.580, 0.532 ] 
+
+  print type(FCFS)
+
+
  
   p.plot(x,   FCFS, label='FCFS')
   p.plot(x,    LRU, label='LRU')
